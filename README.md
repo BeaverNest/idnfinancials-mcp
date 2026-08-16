@@ -1,7 +1,7 @@
 # IDNFinancials MCP Server
 
 ![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
-![Python](https://img.shields.io/badge/python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)
+![No API key](https://img.shields.io/badge/no--api--key-required-4caf50?style=flat-square)
 ![MCP](https://img.shields.io/badge/MCP-server-7c3aed?style=flat-square)
 
 A read-only [Model Context Protocol](https://modelcontextprotocol.io) server that exposes public company data from [IDNFinancials](https://www.idnfinancials.com) (IDX-listed Indonesian issuers) as 17 MCP tools.
