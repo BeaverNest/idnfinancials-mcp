@@ -1,12 +1,38 @@
 # IDNFinancials MCP Server
 
+![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
+![Python](https://img.shields.io/badge/python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)
+![MCP](https://img.shields.io/badge/MCP-server-7c3aed?style=flat-square)
+
 A read-only [Model Context Protocol](https://modelcontextprotocol.io) server that exposes public company data from [IDNFinancials](https://www.idnfinancials.com) (IDX-listed Indonesian issuers) as 17 MCP tools.
 
 The server talks directly to the same public JSON endpoints the IDNFinancials frontend uses — no API key, no account, no premium content. It is built around a strict safety baseline: read-only access, throttled requests, response caching, and mandatory attribution.
 
-> **Disclaimer & Terms of Service**
-> This project is provided for **personal, non-commercial use only**. Data is delayed/market-informational and **not investment advice**; verify before trading.
-> Per IDNFinancials' terms, attribution is required: *"Digunakan dengan izin dari IDNFinancials.com, layanan dari PT AP&M Indonesia."* The site's `robots.txt` disallows crawling of `/company/data/`; this server replicates the website's own read-only requests at a polite rate without evasions (no proxy rotation, no obfuscation, normal browser user-agent). The upstream may block any IP at any time; that is an accepted risk. **Premium content (quarterly report PDFs, member areas) is never accessed.** Respect the site's terms and this project's license.
+## Table of Contents
+
+- [Disclaimer & Terms of Service](#disclaimer--terms-of-service)
+- [Features](#features)
+- [Tools (17)](#tools-17)
+- [Quickstart](#quickstart)
+- [Configuration](#configuration)
+- [Response shape](#response-shape)
+- [FAQ / Troubleshooting](#faq--troubleshooting)
+- [Notes from reconnaissance](#notes-from-reconnaissance-2026-08-16)
+- [License](#license)
+
+## Disclaimer & Terms of Service
+
+This project is provided for **personal, non-commercial use only**. Data is delayed/market-informational and **not investment advice**; verify before trading.
+
+Per IDNFinancials' terms, the following attributions must be kept:
+
+- **Attribution (required by IDNFinancials terms):**
+  *"Digunakan dengan izin dari IDNFinancials.com, layanan dari PT AP&M Indonesia."*
+- **Notice (required by IDNFinancials terms):**
+  *"Data untuk penggunaan pribadi non-komersial. Data pasar tertunda ~15 menit dan bukan nasihat investasi."*
+  In English: data is for personal non-commercial use, market data is delayed ~15 minutes, and nothing here is investment advice.
+
+The site's `robots.txt` disallows crawling of `/company/data/`; this server replicates the website's own read-only requests at a polite rate without evasions (no proxy rotation, no obfuscation, normal browser user-agent). The upstream may block any IP at any time; that is an accepted risk. **Premium content (quarterly report PDFs, member areas) is never accessed.** Respect the site's terms and this project's license.
 
 ## Features
 
@@ -37,7 +63,7 @@ The server talks directly to the same public JSON endpoints the IDNFinancials fr
 | `get_related_companies` | Peers in the same industry with price/valuation/profit data. |
 | `get_popular_news` | Site-wide popular-news widget (HTML snippet of latest headlines). |
 
-## Install
+## Quickstart
 
 Requires Python 3.10+.
 
@@ -47,7 +73,7 @@ source .venv/bin/activate
 pip install mcp
 ```
 
-## Run (stdio MCP)
+Run as a stdio MCP server:
 
 ```bash
 python mcp_idnfinancials_server.py
@@ -98,11 +124,19 @@ Every tool returns a consistent envelope:
 }
 ```
 
+The `attribution` and `notice` fields above are required by IDNFinancials terms — in English: data is for personal non-commercial use, market data is delayed ~15 minutes, and it is not investment advice.
+
 - Success → `data` (list or dict). Empty result → `data` present plus `empty: true`.
 - Unknown ticker / missing section → `error` with a clear message.
 - Upstream HTTP failure → `error` such as `HTTP 404`, `HTTP 403` (premium PDFs are never fetched), or `TimeoutError: ...`.
 
 `get_popular_news` returns `data` as an HTML snippet instead of JSON.
+
+## FAQ / Troubleshooting
+
+- **Why `HTTP 403`?** Premium PDFs and member pages are never fetched by design. If an upstream request is blocked, wait for the rate limit (default 1.2 s) and retry; the upstream may block an IP at any time.
+- **What happens with an unknown ticker?** The server returns `empty: true` (or a clear `error` for malformed input) — it never guesses.
+- **Can I raise the rate limit?** Yes, via `IDNF_RATE_LIMIT`, but the defaults are the polite baseline; keep throttling enabled to respect the site.
 
 ## Notes from reconnaissance (2026-08-16)
 
@@ -113,6 +147,6 @@ Every tool returns a consistent envelope:
 
 ## License
 
-MIT License — Copyright (c) 2026 Aldiansyah / BeaverNest. See [LICENSE](LICENSE).
+MIT License — Copyright (c) 2026 Aldiansyah / BeaverNest. See [LICENSE](LICENSE). Part of the [BeaverNest](https://github.com/BeaverNest) open-source portfolio.
 
 > Community note: if you publish or distribute anything derived from this data, follow IDNFinancials' Terms of Service (non-commercial use, attribution). This project's MIT license does not override the upstream site's terms.
